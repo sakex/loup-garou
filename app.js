@@ -14,6 +14,10 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/watcher.html');
 })
 
+.get('/images/:image', (req, res) => {
+  res.sendFile(__dirname + '/images/' + req.params.image);
+})
+
 .get('/js/:script', (req, res) => {
   res.sendFile(__dirname + '/build/' + req.params.script);
 });

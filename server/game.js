@@ -36,7 +36,7 @@ class Game {
     }
     this.players.push(player);
     if(this.watcher) this.watcher.update_players();
-    console.log(player.name);
+    socket.emit('inscrit', this.getPlayerList());
   }
 
   /**
@@ -65,15 +65,17 @@ class Game {
     this.players = players;
     this.categories = categories;
 
-    this.day();
+    this.nextStep = this.day;
+    this.timer = 60000;
     this.inverval = setInterval(this.updateTimer, 1000);
+    this.watcher.doNothing('Vous venez de recevoir votre rôle, lisez les instructions sur votre écran et cachez-les!');
   }
 
   day() {
     this.timer = 60000;
     this.isDay = true;
 
-    this.io.emit('doNothing', 'Le jour est revenu, vous pouvez discuter de quel villageois vous allez exécuter');
+    this.io.emit('doNothing', 'Le jour est revenu, vous avez 60 secondes pour discuter de quel villageois vous allez exécuter');
     this.nextStep = this.choose_suspect;
   }
 
@@ -145,7 +147,7 @@ class Game {
 
   updateTimer() {
     this.timer -= 1000;
-    this.io.emit('updateTimer', this.timer);
+    this.io.emit('updateTimer', this.timer/1000);
     if (this.timer == 0) {
       this.nextStep();
     }
@@ -156,6 +158,14 @@ class Game {
     for(var i in this.players){
       if(i.id == id) return player;
     }
+  }
+
+  getPlayerList(){
+    const players = [];
+    for(var i=0, l=this.players.length; i<l; ++i){
+      players.push(this.players[i].name);
+    }
+    return players;
   }
 }
 

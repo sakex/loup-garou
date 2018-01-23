@@ -25,6 +25,8 @@ class Player {
     .on('vote_execute', (yn) => {
       this.vote_execute(yn);
     });
+
+    this.socket.emit('getRole', this.getRole());
   }
 
   choose_suspect(suspect) {
@@ -61,6 +63,10 @@ class Player {
     this.socket.emit("die", str);
     this.socket.removeAllListeners();
     this.game.watcher.update_players();
+  }
+
+  getRole(){
+    return 'villageois';
   }
 }
 

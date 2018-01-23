@@ -8,11 +8,12 @@ class Watcher{
   }
 
   update_players(){
-    const players = [];
-    for(var i=0, l=this.game.players.length; i<l; ++i){
-      players.push(this.game.players[i].name);
-    }
+    const players = this.game.getPlayerList();
     this.socket.emit('update_players', players);
+  }
+
+  doNothing(message){
+    this.socket.emit('doNothing', message);
   }
 }
 
