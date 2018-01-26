@@ -65,8 +65,8 @@ class Game {
     this.players = players;
     this.categories = categories;
 
-    this.nextStep = this.day;
-    this.timer = 60000;
+    this.nextStep = this.choose_suspect;
+    this.timer = 1000;//60000;
     this.inverval = setInterval(this.updateTimer, 1000);
     this.watcher.doNothing('Vous venez de recevoir votre rôle, lisez les instructions sur votre écran et cachez-les!');
   }
@@ -92,6 +92,7 @@ class Game {
       };
     }
     this.votes = votes;
+    console.log(this.votes)
     this.io.emit('choose_suspect', this.votes);
 
     this.nextStep = this.vote_execute;

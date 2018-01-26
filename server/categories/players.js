@@ -29,17 +29,17 @@ class Player {
     this.socket.emit('getRole', this.getRole());
   }
 
-  choose_suspect(suspect) {
+  choose_suspect(suspectID) {
     if (this.currentVote) {
       const index = this.game.votes[this.currentVote].indexOf(this.name);
       this.game.votes[this.currentVote].splice(index, 1);
-      if (this.currentVote == suspect.id) {
+      if (this.currentVote == suspectID) {
         this.currentVote = undefined;
         return;
       }
     }
-    this.game.votes[suspect.id].votes.push(this.name);
-    this.currentVote = suspect.id;
+    this.game.votes[suspectID].votes.push(this.name);
+    this.currentVote = suspectID;
     this.game.io.emit('choose_suspect', this.game.votes);
   }
 

@@ -24259,6 +24259,7 @@ var ReactDOM = require('react-dom');
 var socket = require('socket.io-client')();
 var Inscription = require('./components/inscription.jsx');
 var ShowRole = require('./components/showrole.jsx');
+var Vote = require('./components/vote.jsx');
 
 var Client = function (_React$Component) {
   _inherits(Client, _React$Component);
@@ -24270,13 +24271,21 @@ var Client = function (_React$Component) {
 
     _this.socket = props.socket;
 
-    _this.state = { view: React.createElement(Inscription, { socket: _this.socket }) };
+    _this.state = {
+      view: React.createElement(Inscription, { socket: _this.socket })
+    };
 
     _this.socket.on('inscrit', function (data) {
-      _this.inscrit(data);
+      return _this.inscrit(data);
     }).on('getRole', function (role) {
-      _this.showRole(role);
+      return _this.showRole(role);
+    }).on('doNothing', function (message) {
+      return _this.doNothing(message);
+    }).on('choose_suspect', function (data) {
+      return _this.vote_suspect(data);
     });
+
+    _this.choose_suspect = _this.choose_suspect.bind(_this);
     return _this;
   }
 
@@ -24289,6 +24298,29 @@ var Client = function (_React$Component) {
     key: 'showRole',
     value: function showRole(role) {
       this.setState({ view: React.createElement(ShowRole, { role: role }) });
+    }
+  }, {
+    key: 'doNothing',
+    value: function doNothing(message) {
+      this.setState({
+        view: React.createElement(
+          'div',
+          { id: 'doNothing' },
+          message
+        )
+      });
+    }
+  }, {
+    key: 'vote_suspect',
+    value: function vote_suspect(data) {
+      this.setState({
+        view: React.createElement(Vote, { options: data, vote: this.choose_suspect })
+      });
+    }
+  }, {
+    key: 'choose_suspect',
+    value: function choose_suspect(id) {
+      this.socket.emit('choose_suspect', id);
     }
   }, {
     key: 'render',
@@ -24306,7 +24338,7 @@ var Client = function (_React$Component) {
 
 ReactDOM.render(React.createElement(Client, { socket: socket }), document.getElementById('react'));
 
-},{"./components/inscription.jsx":68,"./components/showrole.jsx":69,"react":56,"react-dom":53,"socket.io-client":57}],68:[function(require,module,exports){
+},{"./components/inscription.jsx":68,"./components/showrole.jsx":69,"./components/vote.jsx":70,"react":56,"react-dom":53,"socket.io-client":57}],68:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -24435,7 +24467,8 @@ var villageois = React.createElement(
     "div",
     null,
     "Les villageois sont les simples habitants du village, leur r\xF4le est de d\xE9busquer les loups garous afin de voter contre eux pour les \xE9liminer."
-  )
+  ),
+  React.createElement("img", { src: "/images/villageois.jpg" })
 );
 
 var roles = {
@@ -24466,5 +24499,75 @@ var ShowRole = function (_React$Component) {
 }(React.Component);
 
 module.exports = ShowRole;
+
+},{"react":56}],70:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+var Vote = function (_React$Component) {
+  _inherits(Vote, _React$Component);
+
+  function Vote() {
+    _classCallCheck(this, Vote);
+
+    return _possibleConstructorReturn(this, (Vote.__proto__ || Object.getPrototypeOf(Vote)).apply(this, arguments));
+  }
+
+  _createClass(Vote, [{
+    key: "render",
+    value: function render() {
+      var options = [];
+      var po = this.props.options;
+      for (var o in po) {
+        options.push(React.createElement(Option, { name: po[o].name, onClick: function onClick(_) {
+            return po[o].vote(po[o].id);
+          } }));
+      }
+
+      return React.createElement(
+        "div",
+        { className: "vote_container" },
+        options
+      );
+    }
+  }]);
+
+  return Vote;
+}(React.Component);
+
+var Option = function (_React$Component2) {
+  _inherits(Option, _React$Component2);
+
+  function Option() {
+    _classCallCheck(this, Option);
+
+    return _possibleConstructorReturn(this, (Option.__proto__ || Object.getPrototypeOf(Option)).apply(this, arguments));
+  }
+
+  _createClass(Option, [{
+    key: "render",
+    value: function render() {
+      var style = { width: this.props.width };
+      return React.createElement(
+        "div",
+        { className: "vote_options", style: style },
+        this.props.name
+      );
+    }
+  }]);
+
+  return Option;
+}(React.Component);
+
+module.exports = Vote;
 
 },{"react":56}]},{},[67]);

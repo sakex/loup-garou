@@ -3,6 +3,7 @@ const ReactDOM = require('react-dom');
 const socket = require('socket.io-client')();
 const Inscription = require('./components/inscription.jsx');
 const ShowRole = require('./components/showrole.jsx');
+const Vote = require('./components/vote.jsx');
 
 class Client extends React.Component {
   constructor(props) {
@@ -14,10 +15,14 @@ class Client extends React.Component {
     };
 
     this.socket.on('inscrit', data => this.inscrit(data))
-    
+
     .on('getRole', role => this.showRole(role))
 
-    .on('doNothing', message => this.doNothing(message));
+    .on('doNothing', message => this.doNothing(message))
+
+    .on('choose_suspect', data => this.vote_suspect(data));
+
+    this.choose_suspect = this.choose_suspect.bind(this);
   }
 
   inscrit(data) {
@@ -32,6 +37,16 @@ class Client extends React.Component {
     this.setState({
       view: <div id="doNothing">{message}</div>
     });
+  }
+
+  vote_suspect(data){
+    this.setState({
+      view: <Vote options={data} vote={this.choose_suspect}/>
+    })
+  }
+
+  choose_suspect(id){
+    this.socket.emit('choose_suspect', id);
   }
 
   render() {
