@@ -1,6 +1,7 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const socket = require('socket.io-client')();
+const playSound = require('./modules/sound_library.js');
 
 class Watcher extends React.Component{
   constructor(props){

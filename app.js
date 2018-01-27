@@ -20,18 +20,35 @@ app.get('/', (req, res) => {
 
 .get('/js/:script', (req, res) => {
   res.sendFile(__dirname + '/build/' + req.params.script);
-});
+})
+
+.get('/css/:style', (req, res) => {
+  res.sendFile(__dirname + '/css/' + req.params.style);
+})
+
+.get('/fonts/:font', (req, res) => {
+  res.sendFile(__dirname + '/fonts/' + req.params.font);
+})
+
+.get('/sounds/:sound', (req, res) => {
+  res.sendFile(__dirname + '/sounds/' + req.params.sound);
+})
 
 io.on('connection', (socket) => {
   socket.on('watcher', () => {
     game.addWatcher(socket);
   })
   .on('newPlayer', (name) => {
-    game.addPlayer(name, socket);
+    if(!game.started){
+      game.addPlayer(name, socket);
+    }
+    else{
+      socket.emit('already_started');
+    }
   })
 });
 
 
-server.listen(80, () => {
+server.listen(80, '0.0.0.0', () => {
   console.log('Online mothafucka');
 });

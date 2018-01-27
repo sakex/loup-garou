@@ -1,0 +1,15 @@
+.vote_options{
+  background-color: red;
+  cursor: pointer;
+}
+
+
+#YN #yn_yes{
+  background-color: red;
+  cursor: pointer;
+}
+
+#yn_no{
+  background-color: green;
+  cursor: pointer;
+}

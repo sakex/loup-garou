@@ -24260,6 +24260,8 @@ var socket = require('socket.io-client')();
 var Inscription = require('./components/inscription.jsx');
 var ShowRole = require('./components/showrole.jsx');
 var Vote = require('./components/vote.jsx');
+var _YN = require('./components/yn.jsx');
+var Dead = require('./components/dead.jsx');
 
 var Client = function (_React$Component) {
   _inherits(Client, _React$Component);
@@ -24277,15 +24279,24 @@ var Client = function (_React$Component) {
 
     _this.socket.on('inscrit', function (data) {
       return _this.inscrit(data);
+    }).on('already_started', function () {
+      alert('La partie a déjà commencé, vous ne pouvez plus vous inscrire!');
+    }).on('nom_pris', function (msg) {
+      return alert(msg);
     }).on('getRole', function (role) {
       return _this.showRole(role);
     }).on('doNothing', function (message) {
       return _this.doNothing(message);
     }).on('choose_suspect', function (data) {
       return _this.vote_suspect(data);
+    }).on('vote_execute', function (data) {
+      return _this.YN(data);
+    }).on('die', function (msg) {
+      return _this.die(msg);
     });
 
     _this.choose_suspect = _this.choose_suspect.bind(_this);
+    _this.vote_execute = _this.vote_execute.bind(_this);
     return _this;
   }
 
@@ -24318,9 +24329,29 @@ var Client = function (_React$Component) {
       });
     }
   }, {
+    key: 'vote_execute',
+    value: function vote_execute(yn) {
+      this.socket.emit('vote_execute', yn);
+    }
+  }, {
+    key: 'YN',
+    value: function YN(data) {
+      this.setState({
+        view: React.createElement(_YN, { data: data, vote_execute: this.vote_execute })
+      });
+    }
+  }, {
     key: 'choose_suspect',
     value: function choose_suspect(id) {
       this.socket.emit('choose_suspect', id);
+    }
+  }, {
+    key: 'die',
+    value: function die(msg) {
+      this.socket = undefined;
+      this.setState({
+        view: React.createElement(Dead, { msg: msg })
+      });
     }
   }, {
     key: 'render',
@@ -24338,7 +24369,54 @@ var Client = function (_React$Component) {
 
 ReactDOM.render(React.createElement(Client, { socket: socket }), document.getElementById('react'));
 
-},{"./components/inscription.jsx":68,"./components/showrole.jsx":69,"./components/vote.jsx":70,"react":56,"react-dom":53,"socket.io-client":57}],68:[function(require,module,exports){
+},{"./components/dead.jsx":68,"./components/inscription.jsx":69,"./components/showrole.jsx":70,"./components/vote.jsx":71,"./components/yn.jsx":72,"react":56,"react-dom":53,"socket.io-client":57}],68:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+var Dead = function (_React$Component) {
+  _inherits(Dead, _React$Component);
+
+  function Dead() {
+    _classCallCheck(this, Dead);
+
+    return _possibleConstructorReturn(this, (Dead.__proto__ || Object.getPrototypeOf(Dead)).apply(this, arguments));
+  }
+
+  _createClass(Dead, [{
+    key: "render",
+    value: function render() {
+      return React.createElement(
+        "div",
+        { id: "dead" },
+        React.createElement(
+          "div",
+          { id: "d_img_wrapper" },
+          React.createElement("img", { src: "/images/dead.jpg", id: "dead_img" })
+        ),
+        React.createElement(
+          "div",
+          { id: "dead_msg" },
+          this.props.msg.toUpperCase()
+        )
+      );
+    }
+  }]);
+
+  return Dead;
+}(React.Component);
+
+module.exports = Dead;
+
+},{"react":56}],69:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -24363,7 +24441,7 @@ var Inscription = function (_React$Component) {
   _createClass(Inscription, [{
     key: 'inscription',
     value: function inscription() {
-      this.socket.emit('newPlayer', document.getElementById('name').value);
+      this.socket.emit('newPlayer', document.getElementById('i_name').value);
     }
   }, {
     key: 'render',
@@ -24378,10 +24456,10 @@ var Inscription = function (_React$Component) {
           { id: 'inscription', onKeyPress: function onKeyPress(e) {
               if (e.which == 13) _this2.inscription();
             } },
-          React.createElement('input', { type: 'text', id: 'name', placeholder: 'Nom' }),
+          React.createElement('input', { type: 'text', id: 'i_name', placeholder: 'Nom' }),
           React.createElement(
             'button',
-            { type: 'button', onClick: this.inscription },
+            { type: 'button', id: 'i_but', onClick: this.inscription },
             'S\'inscrire'
           )
         );
@@ -24442,7 +24520,7 @@ var Inscription = function (_React$Component) {
 
 module.exports = Inscription;
 
-},{"react":56}],69:[function(require,module,exports){
+},{"react":56}],70:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -24500,7 +24578,7 @@ var ShowRole = function (_React$Component) {
 
 module.exports = ShowRole;
 
-},{"react":56}],70:[function(require,module,exports){
+},{"react":56}],71:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -24512,6 +24590,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+
+var max = function max(a, b) {
+  return a > b ? a : b;
+};
 
 var Vote = function (_React$Component) {
   _inherits(Vote, _React$Component);
@@ -24525,12 +24607,25 @@ var Vote = function (_React$Component) {
   _createClass(Vote, [{
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       var options = [];
       var po = this.props.options;
+      var vote_count = 0 | 0;
       for (var o in po) {
-        options.push(React.createElement(Option, { name: po[o].name, onClick: function onClick(_) {
-            return po[o].vote(po[o].id);
+        vote_count += po[o].votes.length;
+      }
+
+      var _loop = function _loop() {
+        var ratio = po[o].votes.length / vote_count * 100;
+        var vote = o;
+        options.push(React.createElement(Option, { name: po[o].name, width: max(ratio, 10), key: o, handleClick: function handleClick() {
+            _this2.props.vote(vote);
           } }));
+      };
+
+      for (var o in po) {
+        _loop();
       }
 
       return React.createElement(
@@ -24556,10 +24651,10 @@ var Option = function (_React$Component2) {
   _createClass(Option, [{
     key: "render",
     value: function render() {
-      var style = { width: this.props.width };
+      var style = { width: this.props.width + "vw" };
       return React.createElement(
         "div",
-        { className: "vote_options", style: style },
+        { className: "vote_options", style: style, onClick: this.props.handleClick },
         this.props.name
       );
     }
@@ -24569,5 +24664,74 @@ var Option = function (_React$Component2) {
 }(React.Component);
 
 module.exports = Vote;
+
+},{"react":56}],72:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+var YN = function (_React$Component) {
+  _inherits(YN, _React$Component);
+
+  function YN() {
+    _classCallCheck(this, YN);
+
+    return _possibleConstructorReturn(this, (YN.__proto__ || Object.getPrototypeOf(YN)).apply(this, arguments));
+  }
+
+  _createClass(YN, [{
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      var s_yes = this.props.data.yes.length,
+          s_no = this.props.data.no.length,
+          total = s_yes + s_no;
+      s_yes = s_yes / total;
+      s_no = 1 - s_yes; // Optimisation ma gueule
+
+      if (s_yes == 0 && s_no == 0) {
+        s_yes = .5;
+        s_no = .5;
+      }
+
+      return React.createElement(
+        "div",
+        { id: "YN" },
+        React.createElement(
+          "h1",
+          null,
+          this.props.data.player.name
+        ),
+        React.createElement(
+          "div",
+          { id: "yn_yes", style: { width: "calc(" + s_yes * 30 + "vw + 3em" }, onClick: function onClick() {
+              return _this2.props.vote_execute('yes');
+            } },
+          "Oui"
+        ),
+        React.createElement(
+          "div",
+          { id: "yn_no", style: { width: "calc(" + s_no * 30 + "vw + 3em" }, onClick: function onClick() {
+              return _this2.props.vote_execute('no');
+            } },
+          "Non"
+        )
+      );
+    }
+  }]);
+
+  return YN;
+}(React.Component);
+
+module.exports = YN;
 
 },{"react":56}]},{},[67]);

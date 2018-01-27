@@ -22,7 +22,7 @@ class Player {
       this.choose_suspect(suspect);
     })
 
-    .on('vote_execute', (yn) => {
+    .on('vote_execute', yn => {
       this.vote_execute(yn);
     });
 
@@ -31,10 +31,11 @@ class Player {
 
   choose_suspect(suspectID) {
     if (this.currentVote) {
-      const index = this.game.votes[this.currentVote].indexOf(this.name);
-      this.game.votes[this.currentVote].splice(index, 1);
+      const index = this.game.votes[this.currentVote].votes.indexOf(this.name);
+      this.game.votes[this.currentVote].votes.splice(index, 1);
       if (this.currentVote == suspectID) {
         this.currentVote = undefined;
+        this.game.io.emit('choose_suspect', this.game.votes);
         return;
       }
     }
@@ -45,13 +46,15 @@ class Player {
 
   vote_execute(yn) {
     if (this.execute) {
-      this.game.execute[this.execute].delete(this.id);
+      const index = this.game.execute[this.execute].indexOf(this.id);
+      this.game.execute[this.execute].splice(index, 1);
       if (this.execute == yn) {
         this.execute = "";
+        this.game.io.emit('vote_execute', this.game.execute);
         return;
       }
     }
-    this.game.execute[this.execute].add(this.id);
+    this.game.execute[yn].push(this.id);
     this.execute = yn;
     this.game.io.emit('vote_execute', this.game.execute);
   }

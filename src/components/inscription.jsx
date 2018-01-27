@@ -2,7 +2,7 @@ const React = require('react');
 
 class Inscription extends React.Component {
   inscription(){
-    this.socket.emit('newPlayer', document.getElementById('name').value);
+    this.socket.emit('newPlayer', document.getElementById('i_name').value);
   }
 
   render() {
@@ -13,8 +13,8 @@ class Inscription extends React.Component {
           if (e.which == 13)
             this.inscription();
           }}>
-        <input type="text" id="name" placeholder="Nom"></input>
-        <button type="button" onClick={this.inscription}>S'inscrire</button>
+        <input type="text" id="i_name" placeholder="Nom"></input>
+        <button type="button" id="i_but" onClick={this.inscription}>S'inscrire</button>
       </div>)
       return div;
     }

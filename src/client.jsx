@@ -4,6 +4,8 @@ const socket = require('socket.io-client')();
 const Inscription = require('./components/inscription.jsx');
 const ShowRole = require('./components/showrole.jsx');
 const Vote = require('./components/vote.jsx');
+const YN = require('./components/yn.jsx');
+const Dead = require('./components/dead.jsx');
 
 class Client extends React.Component {
   constructor(props) {
@@ -16,13 +18,22 @@ class Client extends React.Component {
 
     this.socket.on('inscrit', data => this.inscrit(data))
 
+    .on('already_started', () => {alert('La partie a déjà commencé, vous ne pouvez plus vous inscrire!')})
+
+    .on('nom_pris', msg => alert(msg))
+
     .on('getRole', role => this.showRole(role))
 
     .on('doNothing', message => this.doNothing(message))
 
-    .on('choose_suspect', data => this.vote_suspect(data));
+    .on('choose_suspect', data => this.vote_suspect(data))
+
+    .on('vote_execute', data => this.YN(data))
+
+    .on('die', msg => this.die(msg));
 
     this.choose_suspect = this.choose_suspect.bind(this);
+    this.vote_execute = this.vote_execute.bind(this);
   }
 
   inscrit(data) {
@@ -45,8 +56,25 @@ class Client extends React.Component {
     })
   }
 
+  vote_execute(yn){
+    this.socket.emit('vote_execute', yn);
+  }
+
+  YN(data){
+    this.setState({
+      view: <YN data={data} vote_execute={this.vote_execute}/>
+    })
+  }
+
   choose_suspect(id){
     this.socket.emit('choose_suspect', id);
+  }
+
+  die(msg){
+    this.socket = undefined;
+    this.setState({
+      view: <Dead msg={msg} />
+    })
   }
 
   render() {

@@ -11,6 +11,7 @@ class Game {
     this.idAt = 0;
     this.isDay = true;
     this.io = io;
+    this.started = false;
 
     this.categories = {
       "Villageois": Villageois,
@@ -29,6 +30,21 @@ class Game {
   * @param {socket} socket - The socket to communicate with the player
   */
   addPlayer(name, socket) {
+    const length = name.length;
+    if(length < 4){
+      socket.emit('bad_name', 'Votre nom doit contenir au moins 4 carractères');
+      return;
+    }
+    if(length > 10){
+      socket.emit('bad_name', 'Votre nom doit contenir au maximum 10 carractères');
+      return;
+    }
+    for(var p of this.players){
+      if(name == p.name){
+        socket.emit('bad_name', 'Ce nom est déjà pris, veuillez en choisir un autre');
+        return;
+      }
+    }
     const player = {
       id: this.idAt++,
       name: name,
@@ -36,7 +52,11 @@ class Game {
     }
     this.players.push(player);
     if(this.watcher) this.watcher.update_players();
-    socket.emit('inscrit', this.getPlayerList());
+
+    for(var p of this.players){
+      p.socket.emit('inscrit', this.getPlayerList());
+    }
+    (this.watcher) && this.watcher.update_players();
   }
 
   /**
@@ -45,22 +65,25 @@ class Game {
   * @param {number} config.value - The number of player in a given category
   */
   init(config) {
+    this.started = true;
     if(!config){
-      config = {Villageois: 1}
+      config = {Villageois: 2}
     }
     const players = [],
       categories = [];
     for (var category in config) {
-      let index = 0;
-      if(this.players.length > 1) index = Math.round(Math.random() * (this.players.length-1));
-      const player = new this.categories[category](this.players[index], this);
-      players.push(player);
-      if (categories[category]) {
-        categories[category].push(player);
-      } else {
-        categories[category] = [player];
+      for(var it = 0; it<config[category]; ++it){
+        let index = 0;
+        if(this.players.length > 1) index = Math.round(Math.random() * (this.players.length-1));
+        const player = new this.categories[category](this.players[index], this);
+        players.push(player);
+        if (categories[category]) {
+          categories[category].push(player);
+        } else {
+          categories[category] = [player];
+        }
+        this.players.splice(index, 1);
       }
-      this.players.splice(index, 1);
     }
     this.players = players;
     this.categories = categories;
@@ -80,9 +103,9 @@ class Game {
   }
 
   choose_suspect() {
-    this.timer = 60000;
+    this.timer = 1000;
 
-    const votes = {};
+    let votes = {};
     for (var player of this.players) {
       player.currentVote = undefined;
       votes[player.id] = {
@@ -92,17 +115,16 @@ class Game {
       };
     }
     this.votes = votes;
-    console.log(this.votes)
     this.io.emit('choose_suspect', this.votes);
 
     this.nextStep = this.vote_execute;
   }
 
   vote_execute() {
-    this.timer = 60000;
+    this.timer = 5000;
 
-    let max = this.votes[0];
-    for(var i = 1; i<this.votes.length; ++i){
+    let max = this.votes[Object.keys(this.votes)[0]];
+    for(var i in this.votes){
       const player = this.votes[i];
       if(max.votes.length<player.votes.length){
         max = player;
@@ -111,8 +133,8 @@ class Game {
 
     this.execute = {
       player: max,
-      yes: new Set(),
-      no: new Set()
+      yes: [],
+      no: []
     }
 
     for (var player of this.players)
@@ -124,14 +146,14 @@ class Game {
   }
 
   execution(){
-    this.timer = 30000;
+    this.timer = 20000;
     let str = "Etant donné le nombre de votes en faveur de l'exécution de "+this.execute.player.name;
 
-    if(this.execute.yes.size > this.execute.no.size){
+    if(this.execute.yes.length > this.execute.no.length){
       str += ", celui-ci va être exécuté";
       this.io.emit('executed', str);
       const player = this.findPlayerById(this.execute.player.id);
-      player.die("Vous avec été exécuté");
+      player.die("Le village a décidé de vous exécuter!");
     }
     else{
       str += ", vous avez décidé de l'épargner";
@@ -155,9 +177,8 @@ class Game {
   }
 
   findPlayerById(id){
-    let player;
-    for(var i in this.players){
-      if(i.id == id) return player;
+    for(var player of this.players){
+      if(player.id == id) return player;
     }
   }
 
