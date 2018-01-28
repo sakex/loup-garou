@@ -15,6 +15,7 @@
     ]
   },
   "scripts": {
+    "install": "npm run compile",
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "browserify src/watcher.jsx -o build/watcher.js && browserify src/client.jsx -o build/client.js"
   },

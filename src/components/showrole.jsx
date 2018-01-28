@@ -10,8 +10,19 @@ const villageois = (
   </div>
 );
 
+const LG = (
+  <div>
+    <h1>Loup Garou</h1>
+    <div>
+      Les loups garous sont des bêtes sournoises qui vivent parmis les humains le jour et se transforment en loup la nuit pour dévorrer un des villageois. Leur but est d'éliminer tous les villageois afin de prendre le contrôle du village.
+    </div>
+    <img src="/images/lg.jpg" />
+  </div>
+);
+
 const roles = {
-  "villageois": villageois
+  "villageois": villageois,
+  "Loups Garous": LG
 }
 
 class ShowRole extends React.Component{

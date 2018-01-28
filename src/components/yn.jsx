@@ -15,9 +15,15 @@ class YN extends React.Component{
 
     return(
       <div id="YN">
-        <h1>{this.props.data.player.name}</h1>
-        <div id="yn_yes" style={{width: "calc("+(s_yes*30)+"vw + 3em"}} onClick={() => this.props.vote_execute('yes')}>Oui</div>
-        <div id="yn_no" style={{width: "calc("+(s_no*30)+"vw + 3em"}} onClick={() => this.props.vote_execute('no')}>Non</div>
+        <h1>Voulez vous exécuter {this.props.data.player.name}?</h1>
+        <div id="yn_yes" style={{width: "calc("+(s_yes*30)+"vw + 3em"}}
+          onClick={() => {
+            this.props.vote_execute && this.props.vote_execute('yes')
+          }}>Oui</div>
+        <div id="yn_no" style={{width: "calc("+(s_no*30)+"vw + 3em"}}
+          onClick={() => {
+            this.props.vote_execute && this.props.vote_execute('no')
+          }}>Non</div>
       </div>
     );
   }

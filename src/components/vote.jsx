@@ -14,7 +14,7 @@ class Vote extends React.Component{
       const ratio = (po[o].votes.length/vote_count)*100;
       const vote = o;
       options.push(<Option name={po[o].name} width={max(ratio, 10)} key={o} handleClick={() => {
-        this.props.vote(vote);
+        this.props.vote && this.props.vote(vote);
       }}/>);
     }
 

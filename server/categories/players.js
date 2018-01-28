@@ -16,17 +16,14 @@ class Player {
     this.name = config.name;
     this.dead = false;
 
+    this.state = ['getRole', this.getRole()];
+
     this.game = game;
 
-    this.socket.on('choose_suspect', (suspect) => {
-      this.choose_suspect(suspect);
-    })
-
-    .on('vote_execute', yn => {
-      this.vote_execute(yn);
-    });
+    this.attachListeners();
 
     this.socket.emit('getRole', this.getRole());
+    this.team = 'Villageois';
   }
 
   choose_suspect(suspectID) {
@@ -63,9 +60,38 @@ class Player {
     this.dead = true;
     const index = this.game.players.indexOf(this);
     this.game.players.splice(index, 1);
+
+    const index_team = this.game.categories[this.team].indexOf(this);
+    this.game.categories[this.team].splice(index_team, 1);
+
     this.socket.emit("die", str);
     this.socket.removeAllListeners();
     this.game.watcher.update_players();
+  }
+
+  night(){
+    const msg = 'La nuit est tombée, \
+    en tant que bon villageois, vous allez vous coucher pour passer \
+    une bonne nuit de sommeil';
+    this.socket.emit('doNothing', msg);
+    this.state = ['doNothing', msg];
+  }
+
+  newSocket(socket){
+    this.socket = socket;
+    this.socket.emit('isDay', this.game.isDay);
+    this.socket.emit(this.state[0], this.state[1]);
+    this.attachListeners();
+  }
+
+  attachListeners(){
+    this.socket.on('choose_suspect', (suspect) => {
+      this.choose_suspect(suspect);
+    })
+
+    .on('vote_execute', yn => {
+      this.vote_execute(yn);
+    });
   }
 
   getRole(){

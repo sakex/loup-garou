@@ -38,7 +38,21 @@ io.on('connection', (socket) => {
   socket.on('watcher', () => {
     game.addWatcher(socket);
   })
-  .on('newPlayer', (name) => {
+  .on('askState', cookie => {
+    if(game.session == cookie.session){
+      const player = game.findPlayerById(cookie.id);
+      if(player){
+        player.newSocket(socket);
+      }
+      else{
+        socket.emit('setCookie', '');
+      }
+    }
+    else{
+      socket.emit('setCookie', '');
+    }
+  })
+  .on('newPlayer', name => {
     if(!game.started){
       game.addPlayer(name, socket);
     }
