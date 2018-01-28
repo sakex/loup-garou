@@ -81,12 +81,20 @@ class Game {
   */
   init(config) {
     this.started = true;
+
     if(!config){
       config = {
-          "Villageois": 1,
-        "Loups Garous": 1
+        "Loups Garous": Math.floor(this.players.length/3),
+        timePerRound: 300
       }
     }
+    else if(!config.timePerRound) config.timePerRound = 300;
+    else if(!config["Loups Garous"]) config["Loups Garous"] = Math.floor(this.players.length/3);
+
+    this.baseTime = config.timePerRound;
+    delete config.timePerRound;
+
+    config["Villageois"] = this.players.length - config["Loups Garous"];
     const players = [],
       categories = {
       "Villageois": [],
@@ -110,13 +118,13 @@ class Game {
     this.categories = categories;
 
     this.nextStep = this.choose_suspect;
-    this.timer = 10;//60000;
+    this.timer = this.baseTime;
     this.interval = setInterval(this.updateTimer, 1000);
-    this.watcher.doNothing('Vous venez de recevoir votre rôle, lisez les instructions sur votre écran et cachez-les!');
+    this.watcher.doNothing('Vous venez de recevoir votre rôle, lisez les instructions sur votre écran discrètement!');
   }
 
   day() {
-    this.timer = 5;
+    this.timer = this.baseTime;
     this.isDay = true;
     const msg = 'Le jour est revenu, vous avez 60 secondes pour discuter de quel villageois vous allez exécuter';
     this.io.emit('isDay', this.isDay);
@@ -126,7 +134,7 @@ class Game {
   }
 
   choose_suspect() {
-    this.timer = 5;
+    this.timer = this.baseTime;
 
     let votes = {};
     this.votes = {};
@@ -147,7 +155,7 @@ class Game {
   }
 
   vote_execute() {
-    this.timer = 5;
+    this.timer = this.baseTime;
 
     let max = this.votes[Object.keys(this.votes)[0]];
     for(var i in this.votes){
@@ -174,7 +182,7 @@ class Game {
   }
 
   execution(){
-    this.timer = 5;
+    this.timer = this.baseTime;
     let str = "Etant donné le nombre de votes en faveur de l'exécution de "+this.execute.player.name;
 
     if(this.execute.yes.length > this.execute.no.length){
@@ -197,7 +205,7 @@ class Game {
   }
 
   night() {
-    this.timer = 8;
+    this.timer = this.baseTime;
     this.isDay = false;
 
     this.lg_votes = {};
@@ -229,7 +237,7 @@ class Game {
   }
 
   nightSummary(){
-    this.timer = 10;
+    this.timer = this.baseTime;
     let victime = this.lg_votes[Object.keys(this.lg_votes)[0]];
     for(var villageois in this.lg_votes){
       if(victime.votes.length < this.lg_votes[villageois].votes.length){

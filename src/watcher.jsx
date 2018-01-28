@@ -31,6 +31,12 @@ class Watcher extends React.Component{
           <p id="instructions">
             Cliquez sur "Commencer" quand vous souhaitez commencer la partie
           </p>
+          <div id="config_form">
+            Configuration:<br/><br/>
+            <input type="number" placeholder="Nombre de loups" id="lg_count"/>
+            <br/><br/>
+            <input type="number" placeholder="Secondes par round" id="sc_count"/>
+          </div>
           <button id="begin" onClick={this.start}>Commencer</button>
         </div>
       ),
@@ -51,12 +57,24 @@ class Watcher extends React.Component{
   }
 
   start(){
-    this.socket.emit('start');
+    const config = {
+      "Loups Garous": document.getElementById('lg_count').value,
+      timePerRound: document.getElementById('sc_count').value
+    };
+
+    this.socket.emit('start', config);
   }
 
   vote_suspect(data){
     this.setState({
-      view: <Vote options={data} />
+      view: (
+        <div>
+          <div id="instructions">
+            Des loups garous vivent parmis vous! Votez pour juger un villageois suspect!
+          </div>
+          <Vote options={data} title={<h3>Vote: </h3>} />
+        </div>
+      )
     })
   }
 

@@ -16,7 +16,7 @@ const day = {
 
 const night = {
   backgroundColor: "#131A22",
-  color: "#232F3E"
+  color: "aliceblue"
 }
 
 class Client extends React.Component {
@@ -59,7 +59,7 @@ class Client extends React.Component {
 
   vote_suspect(data){
     this.setState({
-      view: <Vote options={data} vote={this.choose_suspect}/>
+      view: <Vote options={data} title={<h3>Vote: </h3>} vote={this.choose_suspect}/>
     })
   }
 

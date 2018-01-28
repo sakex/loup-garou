@@ -29,7 +29,7 @@
   position: absolute;
   width: 800px;
   left: calc(50% - 400px);
-  font-size: 50px;
+  font-size: 30px;
   top: 10%;
   text-align: center;
   display: inline-block;
@@ -59,4 +59,47 @@
   line-height: normal;
   text-transform: capitalize;
   font-size: 30px;
+}
+
+.vote_container{
+  position: absolute;
+  width: 40%;
+  left: 20px;
+  font-size: 50px;
+  bottom: 10px;
+  top: auto;
+}
+
+#config_form{
+  position: absolute;
+  right: 20px;
+  top: 50px;
+  background-color: #262626;
+  display: inline-block;
+  padding: 0px 0px 10px 10px;
+  color: #ffc107;
+  border-radius: 5px;
+  box-shadow: #033d6f 5px 5px;
+  max-height: 70%;
+  overflow-y: hidden;
+  width: 200px;
+}
+
+#config_form input{
+  width: 150px;
+  height: 50px;
+  font-size: 20px;
+}
+
+::-webkit-input-placeholder {
+  font-size: 13px;
+}
+::-moz-placeholder {
+  font-size: 13px;
+}
+:-ms-input-placeholder {
+  font-size: 13px;
+}
+::placeholder {
+  font-size: 13px;
 }
