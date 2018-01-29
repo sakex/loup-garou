@@ -36,6 +36,10 @@ class Watcher extends React.Component{
             <input type="number" placeholder="Nombre de loups" id="lg_count"/>
             <br/><br/>
             <input type="number" placeholder="Secondes par round" id="sc_count"/>
+            <br/><br/>
+            Nymphomane? <input type="checkbox" id="sc_nympho"/>
+            <br/><br/>
+            Sniper? <input type="checkbox" id="sc_sniper"/>
           </div>
           <button id="begin" onClick={this.start}>Commencer</button>
         </div>
@@ -59,7 +63,9 @@ class Watcher extends React.Component{
   start(){
     const config = {
       "Loups Garous": document.getElementById('lg_count').value,
-      timePerRound: document.getElementById('sc_count').value
+      timePerRound: document.getElementById('sc_count').value,
+      "Nymphomane": document.getElementById('sc_nympho').checked*1,
+      "Sniper": document.getElementById('sc_sniper').checked*1
     };
 
     this.socket.emit('start', config);

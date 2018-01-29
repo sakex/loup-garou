@@ -7,6 +7,7 @@ const Vote = require('./components/vote.jsx');
 const YN = require('./components/yn.jsx');
 const Dead = require('./components/dead.jsx');
 const Win = require('./components/win.jsx');
+const Selection = require('./components/selection.jsx');
 
 
 const day = {
@@ -41,6 +42,8 @@ class Client extends React.Component {
     this.choose_suspect = this.choose_suspect.bind(this);
     this.choosePrey = this.choosePrey.bind(this);
     this.vote_execute = this.vote_execute.bind(this);
+    this.nympho_selection = this.nympho_selection.bind(this);
+    this.sniper_select = this.sniper_select.bind(this);
   }
 
   inscrit(data) {
@@ -87,6 +90,32 @@ class Client extends React.Component {
     this.socket.emit('loup_garou_vote', id);
   }
 
+  nympho_night(data){
+    this.setState({
+      view: <Selection list={data.list} selection={data.selection} handler={this.nympho_selection} />
+    })
+  }
+
+  nympho_selection(vote){
+    this.socket.emit('nympho_selection', vote);
+  }
+
+  sniper_die(data){
+    this.setState({
+      special: <Selection list={data.list} selection={data.victime} handler={this.sniper_select} />
+    })
+  }
+
+  sniper_select(victime){
+    this.socket.emit('sniper_select', victime);
+  }
+
+  special(msg){
+    this.setState({
+      special: <div id="special">{msg}</div>
+    })
+  }
+
   die(msg){
     this.socket.removeAllListeners();
     this.socket = undefined;
@@ -110,6 +139,7 @@ class Client extends React.Component {
     return (
     <div id="page" style={this.state.daynight}>
       {this.state.view}
+      {this.state.special && this.state.special}
     </div>)
   }
 
@@ -144,6 +174,12 @@ class Client extends React.Component {
     .on('loup_garou_vote', data => this.loup_garou_vote(data))
 
     .on('die', msg => this.die(msg))
+
+    .on('nympho_night', list => this.nympho_night(list))
+
+    .on('special', role => this.special(role))
+
+    .on('sniper_die', data => this.sniper_die(data))
 
     .on('win', winner => this.win(winner));
   }

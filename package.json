@@ -17,7 +17,8 @@
   "scripts": {
     "install": "npm run compile",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "browserify src/watcher.jsx -o build/watcher.js && browserify src/client.jsx -o build/client.js"
+    "compile": "browserify src/watcher.jsx -o build/watcher.js && browserify src/client.jsx -o build/client.js",
+    "build": "browserify -g [ envify --NODE_ENV production ] -g uglifyify -p bundle-collapser/plugin src/client.jsx | uglifyjs --compress --mangle> build/client.js"
   },
   "author": "Alexandre Senges (alexandre.senges@unil.ch)",
   "license": "ISC",
@@ -33,7 +34,11 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "babelify": "^8.0.0",
-    "browserify": "^15.2.0"
+    "browserify": "^15.2.0",
+    "bundle-collapser": "^1.3.0",
+    "envify": "^4.1.0",
+    "uglifyify": "^4.0.5",
+    "uglifyjs": "^2.4.11"
   },
   "repository": {
     "type": "git",

@@ -7,6 +7,7 @@ class LG extends Player{
   }
 
   night(){
+    this.LG_vote = undefined;
     this.socket.emit('loup_garou_vote', this.game.lg_votes);
     this.state = ['loup_garou_vote', this.game.lg_votes];
   }
@@ -29,7 +30,7 @@ class LG extends Player{
 
   attachListeners(){
     super.attachListeners();
-    
+
     this.socket.on('loup_garou_vote', vote => {
       this.loup_garou_vote(vote);
     });

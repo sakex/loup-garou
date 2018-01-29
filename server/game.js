@@ -1,5 +1,7 @@
 const Villageois = require('./categories/players.js');
 const LG = require('./categories/LG.js');
+const Nympho = require('./categories/nympho.js');
+const Sniper = require('./categories/sniper.js');
 const Watcher = require(__dirname + '/watcher.js');
 const genSessId = require(__dirname + '/genSessId.js');
 
@@ -18,7 +20,9 @@ class Game {
 
     this.categories = {
       "Villageois": Villageois,
-      "Loups Garous": LG
+      "Loups Garous": LG,
+      "Nymphomane": Nympho,
+      "Sniper": Sniper
     }
 
     this.updateTimer = this.updateTimer.bind(this);
@@ -94,7 +98,11 @@ class Game {
     this.baseTime = config.timePerRound;
     delete config.timePerRound;
 
-    config["Villageois"] = this.players.length - config["Loups Garous"];
+    let total = 0;
+    for(var c in config){
+      total += parseInt(config[c]);
+    }
+    config["Villageois"] = this.players.length - total;
     const players = [],
       categories = {
       "Villageois": [],
@@ -182,6 +190,7 @@ class Game {
   }
 
   execution(){
+    this.nextStep = this.night;
     this.timer = this.baseTime;
     let str = "Etant donné le nombre de votes en faveur de l'exécution de "+this.execute.player.name;
 
@@ -200,7 +209,6 @@ class Game {
     }
     this.watcher.socket.emit('doNothing', str);
 
-    this.nextStep = this.night;
     this.checkWin();
   }
 
@@ -237,21 +245,42 @@ class Game {
   }
 
   nightSummary(){
+    this.nextStep = this.day;
     this.timer = this.baseTime;
     let victime = this.lg_votes[Object.keys(this.lg_votes)[0]];
     for(var villageois in this.lg_votes){
       if(victime.votes.length < this.lg_votes[villageois].votes.length){
-        vitime = this.lg_votes[villageois];
+        victime = this.lg_votes[villageois];
       }
     }
-    const str = "Cette nuit, les loups garous \
+
+    let str = "Cette nuit, les loups garous \
     se sont réveillés et ont décidé d'éliminer "
-    + victime.name;
+    + victime.name + ". \n";
+
+    if(this.nympho){
+      if(victime.name == this.nympho.nympho_selection){
+
+        str += "Malencontreusement, " + this.nympho.name +
+        " qui était attaché(e) au lit avec les yeux bandés n'a pas\
+        eu le temps de fuire les prédateurs. ";
+
+        this.nympho.die("Vous avez ete assassine en même temps que votre coup du soir");
+      }
+      else{
+        if(this.nympho.nympho_selection){
+          const player = this.findPlayerByName(this.nympho.nympho_selection);
+          const role = player.getRole();
+          this.nympho.reveal(role);
+        }
+      }
+    }
+
+
     this.io.emit('doNothing', str);
     const player = this.findPlayerById(victime.id);
     player.die('Les loups garous vous ont mange dans la nuit');
     this.players.map(player => player.state = ['doNothing', str]);
-    this.nextStep = this.day;
     this.checkWin();
   }
 
@@ -266,6 +295,13 @@ class Game {
   findPlayerById(id){
     for(var player of this.players){
       if(player.id == id) return player;
+    }
+    return false;
+  }
+
+  findPlayerByName(name){
+    for(var player of this.players){
+      if(player.name == name) return player;
     }
     return false;
   }
@@ -294,6 +330,28 @@ class Game {
   win(teamName){
     clearInterval(this.interval);
     this.io.emit('win', {team: this.getPlayerList(), name: teamName});
+  }
+
+  sniperDie(sniper){
+    const temp = this.nextStep;
+    this.nextStep = () => {
+      if(sniper.victime){
+        this.timer = this.baseTime;
+        const msg = sniper.name + " était le sniper , \
+        et il a entraîné " + sniper.victime + " dans\
+        la mort.";
+        const victime = this.findPlayerByName(sniper.victime);
+        victime.die('Le sniper vous a tue dans son dernier souffle');
+        this.io.emit('doNothing', msg);
+        this.nextStep = temp;
+        sniper.finally_die();
+        this.checkWin();
+      }
+      else {
+        temp.call(this);
+        sniper.finally_die();
+      }
+    }
   }
 }
 
