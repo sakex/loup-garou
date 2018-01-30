@@ -18,7 +18,9 @@
     "install": "npm run compile",
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "browserify src/watcher.jsx -o build/watcher.js && browserify src/client.jsx -o build/client.js",
-    "build": "browserify -g [ envify --NODE_ENV production ] -g uglifyify -p bundle-collapser/plugin src/client.jsx | uglifyjs --compress --mangle> build/client.js"
+    "buildClient": "browserify -g [ envify --NODE_ENV production ] -g uglifyify -p bundle-collapser/plugin src/client.jsx | uglifyjs --compress --mangle> build/client.js",
+    "buildWatcher": "browserify -g [ envify --NODE_ENV production ] -g uglifyify -p bundle-collapser/plugin src/watcher.jsx | uglifyjs --compress --mangle> build/watcher.js",
+    "build": "npm run buildClient && npm run buildWatcher"
   },
   "author": "Alexandre Senges (alexandre.senges@unil.ch)",
   "license": "ISC",
