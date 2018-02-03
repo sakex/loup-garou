@@ -19,6 +19,13 @@ class Nympho extends Player{
       list: this.list,
       selection: this.nympho_selection
     });
+
+    this.state = [
+      'nympho_night', {
+        list: this.list,
+        selection: this.nympho_selection
+      }
+    ]
   }
 
   nympho_vote(vote){
@@ -33,6 +40,13 @@ class Nympho extends Player{
       list: this.list,
       selection: this.nympho_selection
     });
+
+    this.state = [
+      'nympho_night', {
+        list: this.list,
+        selection: this.nympho_selection
+      }
+    ]
   }
 
   reveal(role){

@@ -63,7 +63,7 @@
 
 .vote_container{
   position: absolute;
-  width: 40%;
+  width: 80%;
   left: 20px;
   font-size: 50px;
   bottom: 10px;
@@ -102,4 +102,8 @@
 }
 ::placeholder {
   font-size: 13px;
+}
+
+#config_form input {
+    height: 32px;
 }

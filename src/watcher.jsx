@@ -40,6 +40,8 @@ class Watcher extends React.Component{
             Nymphomane? <input type="checkbox" id="sc_nympho"/>
             <br/><br/>
             Sniper? <input type="checkbox" id="sc_sniper"/>
+            <br/><br/>
+            Garde du corps? <input type="checkbox" id="sc_bg"/>
           </div>
           <button id="begin" onClick={this.start}>Commencer</button>
         </div>
@@ -65,7 +67,8 @@ class Watcher extends React.Component{
       "Loups Garous": document.getElementById('lg_count').value,
       timePerRound: document.getElementById('sc_count').value,
       "Nymphomane": document.getElementById('sc_nympho').checked*1,
-      "Sniper": document.getElementById('sc_sniper').checked*1
+      "Sniper": document.getElementById('sc_sniper').checked*1,
+      "Bodyguard": document.getElementById('sc_bg').checked*1
     };
 
     this.socket.emit('start', config);

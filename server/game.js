@@ -2,6 +2,7 @@ const Villageois = require('./categories/players.js');
 const LG = require('./categories/LG.js');
 const Nympho = require('./categories/nympho.js');
 const Sniper = require('./categories/sniper.js');
+const Bodyguard = require('./categories/bodyguard.js');
 const Watcher = require(__dirname + '/watcher.js');
 const genSessId = require(__dirname + '/genSessId.js');
 
@@ -22,7 +23,8 @@ class Game {
       "Villageois": Villageois,
       "Loups Garous": LG,
       "Nymphomane": Nympho,
-      "Sniper": Sniper
+      "Sniper": Sniper,
+      "Bodyguard": Bodyguard
     }
 
     this.updateTimer = this.updateTimer.bind(this);
@@ -252,6 +254,22 @@ class Game {
       if(victime.votes.length < this.lg_votes[villageois].votes.length){
         victime = this.lg_votes[villageois];
       }
+    }
+
+    if(this.bodyguard &&
+      this.bodyguard.bg_selection == victime.name){
+        const str = victime.name + " s'est fait attaquer pendant\
+        la nuit, cependant, le garde du corps l'a protègé dans la nuit!"
+        this.io.emit('doNothing', str);
+        this.players.map(player => player.state = ['doNothing', str]);
+
+        if(this.nympho &&
+          this.nympho.nympho_selection){
+          const player = this.findPlayerByName(this.nympho.nympho_selection);
+          const role = player.getRole();
+          this.nympho.reveal(role);
+        }
+        return;
     }
 
     let str = "Cette nuit, les loups garous \

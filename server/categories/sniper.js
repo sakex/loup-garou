@@ -20,6 +20,14 @@ class Sniper extends Player{
       list: this.list,
       victime: this.victime
     });
+
+    this.state = [
+      "sniper_die", {
+        list: this.list,
+        victime: this.victime
+      }
+    ];
+    
     this.socket.on('sniper_select', vote => {
       if(this.victime == vote){
         this.victime = "";

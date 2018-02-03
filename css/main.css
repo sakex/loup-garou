@@ -68,7 +68,9 @@ body{
 }
 
 #showRole h1{
-  text-align: center;
+  text-align: justify;
+  width: 100%;
+  font-size: 40px;
 }
 
 #showRole{
@@ -83,6 +85,7 @@ body{
   vertical-align: bottom;
   line-height: 0;
   display: inline-block;
+  max-height: 250px;
 }
 
 @media only screen

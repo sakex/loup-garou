@@ -27,33 +27,37 @@ class Player {
   }
 
   choose_suspect(suspectID) {
-    if (this.currentVote) {
-      const index = this.game.votes[this.currentVote].votes.indexOf(this.name);
-      this.game.votes[this.currentVote].votes.splice(index, 1);
-      if (this.currentVote == suspectID) {
-        this.currentVote = undefined;
-        this.game.io.emit('choose_suspect', this.game.votes);
-        return;
+    if(this.state[0] == 'choose_suspect'){
+      if (this.currentVote) {
+        const index = this.game.votes[this.currentVote].votes.indexOf(this.name);
+        this.game.votes[this.currentVote].votes.splice(index, 1);
+        if (this.currentVote == suspectID) {
+          this.currentVote = undefined;
+          this.game.io.emit('choose_suspect', this.game.votes);
+          return;
+        }
       }
+      this.game.votes[suspectID].votes.push(this.name);
+      this.currentVote = suspectID;
+      this.game.io.emit('choose_suspect', this.game.votes);
     }
-    this.game.votes[suspectID].votes.push(this.name);
-    this.currentVote = suspectID;
-    this.game.io.emit('choose_suspect', this.game.votes);
   }
 
   vote_execute(yn) {
-    if (this.execute) {
-      const index = this.game.execute[this.execute].indexOf(this.id);
-      this.game.execute[this.execute].splice(index, 1);
-      if (this.execute == yn) {
-        this.execute = "";
-        this.game.io.emit('vote_execute', this.game.execute);
-        return;
+    if(this.state[0] == 'vote_execute'){
+      if (this.execute) {
+        const index = this.game.execute[this.execute].indexOf(this.id);
+        this.game.execute[this.execute].splice(index, 1);
+        if (this.execute == yn) {
+          this.execute = "";
+          this.game.io.emit('vote_execute', this.game.execute);
+          return;
+        }
       }
+      this.game.execute[yn].push(this.id);
+      this.execute = yn;
+      this.game.io.emit('vote_execute', this.game.execute);
     }
-    this.game.execute[yn].push(this.id);
-    this.execute = yn;
-    this.game.io.emit('vote_execute', this.game.execute);
   }
 
   die(str){

@@ -13,18 +13,20 @@ class LG extends Player{
   }
 
   loup_garou_vote(vote){
-    if (this.LG_vote) {
-      const index = this.game.lg_votes[this.LG_vote].votes.indexOf(this.name);
-      this.game.lg_votes[this.LG_vote].votes.splice(index, 1);
-      if (this.LG_vote == vote) {
-        this.LG_vote = undefined;
-        this.game.loup_garou_vote();
-        return;
+    if(this.state[0] == 'loup_garou_vote'){
+      if (this.LG_vote) {
+        const index = this.game.lg_votes[this.LG_vote].votes.indexOf(this.name);
+        this.game.lg_votes[this.LG_vote].votes.splice(index, 1);
+        if (this.LG_vote == vote) {
+          this.LG_vote = undefined;
+          this.game.loup_garou_vote();
+          return;
+        }
       }
+      this.game.lg_votes[vote].votes.push(this.name);
+      this.LG_vote = vote;
+      this.game.loup_garou_vote();
     }
-    this.game.lg_votes[vote].votes.push(this.name);
-    this.LG_vote = vote;
-    this.game.loup_garou_vote();
   }
 
 

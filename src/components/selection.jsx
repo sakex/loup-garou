@@ -1,11 +1,11 @@
 const React = require('react');
 
 const selected = {
-  backgroundColor: 'red'
+  backgroundColor: "#FFC107"
 }
 
 const normal = {
-  backgroundColor: 'green'
+  backgroundColor: '#262626'
 }
 
 class Selection extends React.Component{
@@ -26,6 +26,7 @@ class Selection extends React.Component{
     }
     return(
       <div id="selection">
+        {(this.props.message) && (<p>{this.props.message}</p>)}
         {list}
       </div>
     )

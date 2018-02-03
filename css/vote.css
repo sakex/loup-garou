@@ -11,6 +11,16 @@
 }
 
 .vote_container h3{
+  font-size: 50px;
+}
+
+@media (max-width: 415px){
+  .vote_container {
+      width: calc(100% - 15px);
+      font-size: 18px;
+  }
+}
+.vote_container h3{
   display: inline-block;
   height: 0px;
 }
@@ -61,4 +71,23 @@
 #yn_question{
   width: 100%;
   text-align: center;
+}
+
+
+div#selection {
+  width: 75%;
+  position: absolute;
+  top: 30px;
+  left: 12.5%;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.selection_item {
+  line-height: 1.2em;
+  border-radius: 20px;
+}
+
+.vote_container p {
+  line-height: 1.4em;
 }

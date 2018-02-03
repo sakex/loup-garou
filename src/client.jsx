@@ -43,6 +43,7 @@ class Client extends React.Component {
     this.choosePrey = this.choosePrey.bind(this);
     this.vote_execute = this.vote_execute.bind(this);
     this.nympho_selection = this.nympho_selection.bind(this);
+    this.bg_selection = this.bg_selection.bind(this);
     this.sniper_select = this.sniper_select.bind(this);
   }
 
@@ -82,7 +83,9 @@ class Client extends React.Component {
 
   loup_garou_vote(data){
     this.setState({
-      view: <Vote options={data} vote={this.choosePrey} />
+      view: <Vote
+        message="Vous êtes loup garou, vous pouvez voter pour choisir une victime cette nuit!"
+        options={data} vote={this.choosePrey} />
     })
   }
 
@@ -92,7 +95,8 @@ class Client extends React.Component {
 
   nympho_night(data){
     this.setState({
-      view: <Selection list={data.list} selection={data.selection} handler={this.nympho_selection} />
+      view: <Selection message="Vous êtes la nympho, vous pouvez sélectionner quelqu'un avec qui dormir cette nuit!"
+        list={data.list} selection={data.selection} handler={this.nympho_selection} />
     })
   }
 
@@ -100,9 +104,23 @@ class Client extends React.Component {
     this.socket.emit('nympho_selection', vote);
   }
 
+  bg_night(data){
+    this.setState({
+      view: <Selection
+        message="Vous êtes le garde du corps, vous pouvez sélectionner quelqu'un à protèger cette nuit!"
+        list={data.list} selection={data.selection} handler={this.bg_selection} />
+    })
+  }
+
+  bg_selection(vote){
+    this.socket.emit('bg_selection', vote);
+  }
+
   sniper_die(data){
     this.setState({
-      special: <Selection list={data.list} selection={data.victime} handler={this.sniper_select} />
+      special: <Selection
+        message="Vous avez été tué, mais en tant que sniper vous pouvez entraîner quelqu'un avec vous!"
+        list={data.list} selection={data.victime} handler={this.sniper_select} />
     })
   }
 
@@ -176,6 +194,8 @@ class Client extends React.Component {
     .on('die', msg => this.die(msg))
 
     .on('nympho_night', list => this.nympho_night(list))
+
+    .on('bg_night', list => this.bg_night(list))
 
     .on('special', role => this.special(role))
 

@@ -48,11 +48,25 @@ const sniper = (
   </div>
 );
 
+const BG = (
+  <div>
+    <h1>Garde du Corps</h1>
+    <div id="role_img_wrapper">
+      <img id="role_img" src="/images/bodyguard.jpg" />
+    </div>
+    <div id="role_description">
+      Le garde du corps est un civil qui peut protèger un joueur
+      contre les loups garous chaque nuit!
+    </div>
+  </div>
+);
+
 const roles = {
   "villageois": villageois,
   "Loups Garous": LG,
   "nymphomane": nympho,
-  "sniper": sniper
+  "sniper": sniper,
+  "bodyguard": BG
 }
 
 class ShowRole extends React.Component{
