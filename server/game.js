@@ -127,14 +127,14 @@ class Game {
     this.players = players;
     this.categories = categories;
 
-    this.nextStep = this.choose_suspect;
+    this.nextStep = this.night;
     this.timer = this.baseTime;
     this.interval = setInterval(this.updateTimer, 1000);
     this.watcher.doNothing('Vous venez de recevoir votre rôle, lisez les instructions sur votre écran discrètement!');
   }
 
   day() {
-    this.timer = this.baseTime;
+    this.timer = 20;
     this.isDay = true;
     const msg = 'Le jour est revenu, vous avez 60 secondes pour discuter de quel villageois vous allez exécuter';
     this.io.emit('isDay', this.isDay);
@@ -193,7 +193,7 @@ class Game {
 
   execution(){
     this.nextStep = this.night;
-    this.timer = this.baseTime;
+    this.timer = 20;
     let str = "Etant donné le nombre de votes en faveur de l'exécution de "+this.execute.player.name;
 
     if(this.execute.yes.length > this.execute.no.length){
@@ -248,7 +248,7 @@ class Game {
 
   nightSummary(){
     this.nextStep = this.day;
-    this.timer = this.baseTime;
+    this.timer = 20;
     let victime = this.lg_votes[Object.keys(this.lg_votes)[0]];
     for(var villageois in this.lg_votes){
       if(victime.votes.length < this.lg_votes[villageois].votes.length){
